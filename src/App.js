@@ -81,10 +81,8 @@ class ToDo extends Component {
         {content.map((item, index) => {
           return (
             <div key={index}>
-              {item} &nbsp; &nbsp; &nbsp; &nbsp;
-              <button onClick={() => this.removeTask(index)}>
-                remove task
-              </button>
+              <button onClick={() => this.removeTask(index)}>X</button>
+              &nbsp; &nbsp; &nbsp; &nbsp; {item}
             </div>
           );
         })}
