@@ -19,12 +19,13 @@ class ToDo extends Component {
     const storageTasks = JSON.parse(localStorage.getItem("toDoData"));
     //  console.log(localStorage.getItem("toDoData"));
     // this.setState({ content: storageTasks });
-
-    this.setState((state) => {
-      return {
-        content: storageTasks,
-      };
-    });
+    if (storageTasks !== null) {
+      this.setState((state) => {
+        return {
+          content: storageTasks,
+        };
+      });
+    }
   }
 
   handleChange(event) {
