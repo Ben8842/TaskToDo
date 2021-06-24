@@ -15,10 +15,8 @@ class ToDo extends Component {
   }
 
   componentDidMount() {
-    // const storageTasks = localStorage.getItem("toDoData") === "true";
     const storageTasks = JSON.parse(localStorage.getItem("toDoData"));
-    //  console.log(localStorage.getItem("toDoData"));
-    // this.setState({ content: storageTasks });
+
     if (storageTasks !== null) {
       this.setState((state) => {
         return {
@@ -47,13 +45,15 @@ class ToDo extends Component {
 
   removeTask(id) {
     var { content } = this.state;
-    console.log(content[id]);
-    this.setState({
-      content: this.state.content.filter(function (element) {
-        return element !== content[id];
-      }),
+
+    var placeholder = this.state.content.filter(function (element) {
+      return element !== content[id];
     });
-    localStorage.setItem("toDoData", JSON.stringify(content));
+    this.setState({
+      content: placeholder,
+    });
+
+    localStorage.setItem("toDoData", JSON.stringify(placeholder));
   }
 
   render() {
