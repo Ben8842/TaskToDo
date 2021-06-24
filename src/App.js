@@ -22,9 +22,9 @@ class ToDo extends Component {
     event.preventDefault();
   }
 
-  addTask(test) {
+  addTask(newInput) {
     var { content } = this.state;
-    content.push(test);
+    content.push(newInput);
     this.setState((state) => {
       return { content: content };
     });
@@ -32,9 +32,10 @@ class ToDo extends Component {
 
   removeTask(id) {
     var { content, value } = this.state;
+    console.log(content[id]);
     this.setState({
-      content: this.state.content.filter(function (content) {
-        return content !== value;
+      content: this.state.content.filter(function (element) {
+        return element !== content[id];
       }),
     });
   }
@@ -61,11 +62,11 @@ class ToDo extends Component {
     );
     const list = (
       <div>
-        {content.map((value, index) => {
+        {content.map((item, index) => {
           return (
             <div key={index}>
-              {value} &nbsp; &nbsp; &nbsp; &nbsp;
-              <button onClick={() => this.removeTask(this.value)}>
+              {item} &nbsp; &nbsp; &nbsp; &nbsp;
+              <button onClick={() => this.removeTask(index)}>
                 remove task
               </button>
             </div>
