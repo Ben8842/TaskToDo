@@ -1,10 +1,10 @@
-import logo from "./logo.svg";
 import "./App.css";
 import React, { Component } from "react";
 
 class ToDo extends Component {
   constructor(props) {
     super(props);
+
     this.state = {
       content: [],
       value: "",
@@ -12,6 +12,19 @@ class ToDo extends Component {
 
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
+  }
+
+  componentDidMount() {
+    // const storageTasks = localStorage.getItem("toDoData") === "true";
+    const storageTasks = JSON.parse(localStorage.getItem("toDoData"));
+    //  console.log(localStorage.getItem("toDoData"));
+    // this.setState({ content: storageTasks });
+
+    this.setState((state) => {
+      return {
+        content: storageTasks,
+      };
+    });
   }
 
   handleChange(event) {
@@ -28,20 +41,22 @@ class ToDo extends Component {
     this.setState((state) => {
       return { content: content };
     });
+    localStorage.setItem("toDoData", JSON.stringify(content));
   }
 
   removeTask(id) {
-    var { content, value } = this.state;
+    var { content } = this.state;
     console.log(content[id]);
     this.setState({
       content: this.state.content.filter(function (element) {
         return element !== content[id];
       }),
     });
+    localStorage.setItem("toDoData", JSON.stringify(content));
   }
 
   render() {
-    var { content, value } = this.state;
+    var { content } = this.state;
 
     const inputBoxAndButton = (
       <div>
