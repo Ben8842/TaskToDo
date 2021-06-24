@@ -82,7 +82,7 @@ class ToDo extends Component {
           return (
             <div key={index}>
               <button onClick={() => this.removeTask(index)}>X</button>
-              &nbsp; &nbsp; &nbsp; &nbsp; {item}
+              &nbsp;&nbsp;{index + 1} &nbsp; &nbsp; &nbsp; &nbsp; {item}
             </div>
           );
         })}
