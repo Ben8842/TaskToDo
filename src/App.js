@@ -10,6 +10,8 @@ class ToDo extends Component {
       value: "",
       choice: "",
       taskholder: [],
+      valueName: "",
+      saveListFlag: false,
     };
 
     this.handleChange = this.handleChange.bind(this);
@@ -28,6 +30,8 @@ class ToDo extends Component {
     } */
     this.getList();
   }
+
+  saveList(nameinput) {}
 
   shuffle(arry) {
     arry.sort(() => Math.random() - 0.5);
@@ -154,7 +158,24 @@ class ToDo extends Component {
             value="Submit"
           />
         </form>
-        <div>Your random task choice is: {choice}</div>
+      </div>
+    );
+
+    const saveListNameAndInput = (
+      <div>
+        <form onSubmit={this.handleSubmit}>
+          <input
+            placeholder="name your list and save"
+            type="text"
+            value={this.state.valueName}
+            onChange={this.handleChange}
+          ></input>
+          <input
+            onClick={() => this.saveTask(this.state.valueName)}
+            type="submit"
+            value="Save List"
+          />
+        </form>
       </div>
     );
     /*
@@ -188,14 +209,16 @@ class ToDo extends Component {
             </div>
           );
         })}
+        {inputBoxAndButton}
       </div>
     );
 
     return (
       <div>
+        <button>Create a new task list</button>
+        <button>Navigate to your saved lists</button> {saveListNameAndInput}
         <h1>To Do Task List!</h1>
         <div>
-          <div>{inputBoxAndButton}</div>
           <div> &nbsp; &nbsp; &nbsp;</div>
           <div>{list}</div>
         </div>
