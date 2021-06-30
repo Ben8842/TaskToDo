@@ -43,6 +43,30 @@ class ToDo extends Component {
   }
 
   addTask(newInput) {
+    //. console.log("submit Sign Up now");
+    const { content } = this.state;
+    content.push(newInput);
+    this.setState((state) => {
+      return {
+        content: content,
+      };
+    });
+    //  console.log(JSON.stringify({ email, password }));
+    fetch("http://localhost:5000/tasks", {
+      method: "POST",
+      mode: "cors", // no-cors, *cors, same-origin
+      cache: "no-cache", // *default, no-cache, reload, force-cache, only-if-cached
+      credentials: "same-origin", // include, *same-origin, omit
+      headers: {
+        "Content-Type": "application/json",
+        // 'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      referrerPolicy: "no-referrer", // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
+      body: JSON.stringify({ text: content[content.length - 1] }),
+      // body data type must match "Content-Type" header
+    }).then((res) => {});
+
+    /*
     var { content } = this.state;
     content.push(newInput);
     this.setState((state) => {
@@ -51,6 +75,7 @@ class ToDo extends Component {
       };
     });
     localStorage.setItem("toDoData", JSON.stringify(content));
+    */
   }
 
   removeTask(id) {
