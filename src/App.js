@@ -9,6 +9,7 @@ class ToDo extends Component {
       content: [],
       value: "",
       choice: "",
+      taskholder: [],
     };
 
     this.handleChange = this.handleChange.bind(this);
@@ -16,7 +17,7 @@ class ToDo extends Component {
   }
 
   componentDidMount() {
-    const storageTasks = JSON.parse(localStorage.getItem("toDoData"));
+    /* const storageTasks = JSON.parse(localStorage.getItem("toDoData"));
 
     if (storageTasks !== null) {
       this.setState((state) => {
@@ -24,7 +25,8 @@ class ToDo extends Component {
           content: storageTasks,
         };
       });
-    }
+    } */
+    this.getList();
   }
 
   shuffle(arry) {
@@ -65,6 +67,7 @@ class ToDo extends Component {
       body: JSON.stringify({ text: content[content.length - 1] }),
       // body data type must match "Content-Type" header
     }).then((res) => {});
+    this.getList();
 
     /*
     var { content } = this.state;
@@ -78,7 +81,49 @@ class ToDo extends Component {
     */
   }
 
-  removeTask(id) {
+  getList() {
+    var { taskholder } = this.state;
+    fetch("http://localhost:5000/tasks", {
+      method: "GET",
+      mode: "cors",
+      cache: "no-cache",
+      credentials: "same-origin",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      referrerPolicy: "no-referrer",
+    })
+      .then((res) => {
+        //    console.log(JSON.stringify(res) + ".thenres");
+        return res.json();
+      })
+      .then((data) => {
+        this.setState({
+          taskholder: data,
+        });
+
+        console.log("GETLIST FUNCTION TRIGGERED");
+      });
+  }
+
+  removeTask(e) {
+    console.log("we are removing something now with id=" + e.target.id);
+    fetch("http://localhost:5000/tasks/" + e.target.id, {
+      method: "DELETE",
+      mode: "cors",
+      cache: "no-cache",
+      credentials: "same-origin",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      referrerPolicy: "no-referrer",
+      //   body: JSON.stringify({ showButtonIndex }),
+    }).then((res) => {
+      //    console.log("something happening here" + res);
+    });
+    this.getList();
+
+    /*
     var { content } = this.state;
 
     var placeholder = this.state.content.filter(function (element) {
@@ -88,11 +133,11 @@ class ToDo extends Component {
       content: placeholder,
     });
 
-    localStorage.setItem("toDoData", JSON.stringify(placeholder));
+    localStorage.setItem("toDoData", JSON.stringify(placeholder));*/
   }
 
   render() {
-    var { content, choice } = this.state;
+    var { content, choice, taskholder } = this.state;
 
     const inputBoxAndButton = (
       <div>
@@ -112,9 +157,10 @@ class ToDo extends Component {
         <div>Your random task choice is: {choice}</div>
       </div>
     );
-    const list = (
+    /*
+    const listN = (
       <div>
-        {content.map((item, index) => {
+        {taskholder.map((item, index) => {
           return (
             <div key={index}>
               <button onClick={() => this.removeTask(index)}>X</button>
@@ -123,7 +169,28 @@ class ToDo extends Component {
           );
         })}
       </div>
+    );*/
+
+    const list = (
+      <div>
+        {Object.keys(taskholder).map((keyName, i) => {
+          return (
+            <div key={i}>
+              <button
+                onClick={(e) => this.removeTask(e)}
+                type="button"
+                id={taskholder[parseInt(keyName, 10)]._id}
+              >
+                X
+              </button>
+              &nbsp;&nbsp;{i + 1} &nbsp; &nbsp; &nbsp; &nbsp;{" "}
+              {taskholder[parseInt(keyName, 10)].text}
+            </div>
+          );
+        })}
+      </div>
     );
+
     return (
       <div>
         <h1>To Do Task List!</h1>

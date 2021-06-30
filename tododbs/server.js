@@ -32,9 +32,6 @@ app.post("/tasks", (req, res) => {
   console.log("posting super task");
   const body = req.body;
   const taskObject = new tasklist(body);
-  console.log(req.body);
-  console.log(body.newInput);
-
   taskObject.save();
 });
 
@@ -56,10 +53,9 @@ app.get("/tasks", (req, res) => {
 
 //Delete a specific message using id
 app.delete("/tasks/:id", (req, res) => {
-  /*
   console.log("we are deleting", req.params);
   // message.findOneAndDelete({ _id: req.params.id });
-  message.findByIdAndDelete(req.params.id, function (error) {
+  tasklist.findByIdAndDelete(req.params.id, function (error) {
     if (error) {
       console.log(error);
     } else {
@@ -67,7 +63,7 @@ app.delete("/tasks/:id", (req, res) => {
     }
   });
   // message.deleteOne({ _id: "ObjectId(" + req.params.id + ")" });
-  res.send("delete message here"); */
+  res.send("delete message here");
 });
 
 //sign up and save new user to db
