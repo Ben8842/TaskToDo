@@ -16,9 +16,11 @@ const corsOptions = {
 app.use(cors(corsOptions));
 
 const path = require("path");
+const tasklist = require("./models/tasklist");
+const userinfo = require("./models/userinfo");
 
 //const { getMaxListeners } = require("./models/user");
-const tasklist = require("./models/tasklist");
+
 //const user = require("./models/user");
 //const userprofile = require("./models/userprofile");
 //???
@@ -26,6 +28,29 @@ const tasklist = require("./models/tasklist");
 //???
 app.use(express.json());
 //mongoose.set("useFindAndModify", false);
+
+//create db entry and retrieve the id for user purposes
+app.post("/userinfo", (req, res) => {
+  console.log("POSTING userinfo");
+  const body = req.body;
+  const userinfoObject = new userinfo(body);
+  userinfoObject.save();
+});
+
+app.get("/userinfo", (req, res) => {
+  console.log("GETTING userinfo");
+
+  userinfo
+    .find(
+      {},
+
+      (error, data) => {
+        console.log(JSON.stringify(data[data.length - 1]._id) + "stringify");
+        res.json(data[0]._id);
+      }
+    )
+    .sort("-createdAt");
+});
 
 //save a message to the message collection
 app.post("/tasks", (req, res) => {
@@ -65,6 +90,33 @@ app.delete("/tasks/:id", (req, res) => {
   // message.deleteOne({ _id: "ObjectId(" + req.params.id + ")" });
   res.send("delete message here");
 });
+
+// save name to list
+/*
+app.put("/tasks", (req, res) => {
+  console.log("we are saving task", req.params);
+  console.log("value is", req.body);
+  const body = req.body;
+  // message.findOneAndDelete({ _id: req.params.id });
+  message.findById(req.params.id).then((messageItem) => {
+    if (!messageItem.negativeVote.includes(body.email)) {
+      message.findByIdAndUpdate(
+        req.params.id,
+        { $push: { negativeVote: body.email } },
+        function (error) {
+          if (error) {
+            console.log(error);
+          } else {
+            console.log("voting down is a success");
+          }
+        }
+      );
+    }
+  });
+});
+*/
+
+//Delete a specific message using id
 
 //sign up and save new user to db
 /*

@@ -12,6 +12,8 @@ class ToDo extends Component {
       taskholder: [],
       valueName: "",
       saveListFlag: false,
+      appUserName: "",
+      appUserData: [],
     };
 
     this.handleChange = this.handleChange.bind(this);
@@ -28,23 +30,101 @@ class ToDo extends Component {
         };
       });
     } */
+
+    const userLocalStorage = JSON.parse(localStorage.getItem("userLocalData"));
+    if (userLocalStorage !== null) {
+      this.setState((state) => {
+        return {
+          appUserName: userLocalStorage,
+        };
+      });
+    } else if (userLocalStorage === null) {
+      fetch("http://localhost:5000/userinfo", {
+        method: "POST",
+        mode: "cors", // no-cors, *cors, same-origin
+        cache: "no-cache", // *default, no-cache, reload, force-cache, only-if-cached
+        credentials: "same-origin", // include, *same-origin, omit
+        headers: {
+          "Content-Type": "application/json",
+          // 'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        referrerPolicy: "no-referrer", // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
+        body: JSON.stringify({ username: "none" }),
+        // body data type must match "Content-Type" header
+      }).then((res) => {
+        console.log(res);
+      });
+
+      fetch("http://localhost:5000/userinfo", {
+        method: "GET",
+        mode: "cors",
+        cache: "no-cache",
+        credentials: "same-origin",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        referrerPolicy: "no-referrer",
+      })
+        .then((res) => {
+          //    console.log(JSON.stringify(res) + ".thenres");
+          return res.json();
+        })
+        .then((data) => {
+          this.setState({
+            appUserName: data,
+          });
+
+          console.log("added unique id from db entry to appUserName");
+          localStorage.setItem(
+            "userLocalData",
+            JSON.stringify(this.state.appUserName)
+          );
+        });
+    }
+
     this.getList();
   }
+  /*
+  saveList(nameinput) {
+     fetch("http://localhost:5000/tasks", {
+      method: "PUT",
+      mode: "cors",
+      cache: "no-cache",
+      credentials: "same-origin",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      referrerPolicy: "no-referrer",
+      body: JSON.stringify({ email }),
+      //   body: JSON.stringify({ showButtonIndex }),
+    }).then((res) => {
+      console.log(res);
+      this.getList();
+      //    console.log("something happening here" + res);
+    });
 
-  saveList(nameinput) {}
+    console.log("hello task SAVING");
+    //this.clickHandler();
+  }
+  
+*/
 
   shuffle(arry) {
     arry.sort(() => Math.random() - 0.5);
   }
 
   handleChange(event) {
-    this.setState({ value: event.target.value });
+    this.setState({
+      value: event.target.value,
+      valueName: event.target.valueName,
+    });
   }
 
   handleSubmit(event) {
     event.preventDefault();
     this.setState({
       value: "",
+      valueName: "",
     });
   }
 
@@ -141,7 +221,7 @@ class ToDo extends Component {
   }
 
   render() {
-    var { content, choice, taskholder } = this.state;
+    var { content, choice, taskholder, appUserName, appUserData } = this.state;
 
     const inputBoxAndButton = (
       <div>
@@ -171,7 +251,7 @@ class ToDo extends Component {
             onChange={this.handleChange}
           ></input>
           <input
-            onClick={() => this.saveTask(this.state.valueName)}
+            onClick={() => this.saveList(this.state.valueName)}
             type="submit"
             value="Save List"
           />
@@ -215,6 +295,11 @@ class ToDo extends Component {
 
     return (
       <div>
+        <h5>
+          {" "}
+          User Name is :{" "}
+          <div>{appUserName ? appUserName : "this is empty"} </div>
+        </h5>
         <button>Create a new task list</button>
         <button>Navigate to your saved lists</button> {saveListNameAndInput}
         <h1>To Do Task List!</h1>
