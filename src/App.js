@@ -14,6 +14,7 @@ class ToDo extends Component {
       saveListFlag: false,
       appUserName: "",
       appUserData: [],
+      appListName: "",
     };
 
     this.handleChange = this.handleChange.bind(this);
@@ -21,6 +22,7 @@ class ToDo extends Component {
   }
 
   componentDidMount() {
+    console.log(this.state.taskholder);
     /* const storageTasks = JSON.parse(localStorage.getItem("toDoData"));
 
     if (storageTasks !== null) {
@@ -32,10 +34,12 @@ class ToDo extends Component {
     } */
 
     const userLocalStorage = JSON.parse(localStorage.getItem("userLocalData"));
+    const userLocalListName = JSON.parse(localStorage.getItem("userLocalList"));
     if (userLocalStorage !== null) {
       this.setState((state) => {
         return {
           appUserName: userLocalStorage,
+          appListName: userLocalListName,
         };
       });
     } else if (userLocalStorage === null) {
@@ -84,9 +88,12 @@ class ToDo extends Component {
 
     this.getList();
   }
-  /*
+
   saveList(nameinput) {
-     fetch("http://localhost:5000/tasks", {
+    this.setState({ appListName: nameinput });
+    var { appUserName, appListName } = this.state;
+
+    fetch("http://localhost:5000/tasks", {
       method: "PUT",
       mode: "cors",
       cache: "no-cache",
@@ -95,7 +102,7 @@ class ToDo extends Component {
         "Content-Type": "application/json",
       },
       referrerPolicy: "no-referrer",
-      body: JSON.stringify({ email }),
+      body: JSON.stringify({ appUserName, appListName }),
       //   body: JSON.stringify({ showButtonIndex }),
     }).then((res) => {
       console.log(res);
@@ -103,11 +110,13 @@ class ToDo extends Component {
       //    console.log("something happening here" + res);
     });
 
-    console.log("hello task SAVING");
+    console.log("hello name of list SAVING" + nameinput);
+    localStorage.setItem(
+      "userLocalList",
+      JSON.stringify(this.state.appListName)
+    );
     //this.clickHandler();
   }
-  
-*/
 
   shuffle(arry) {
     arry.sort(() => Math.random() - 0.5);
@@ -130,7 +139,7 @@ class ToDo extends Component {
 
   addTask(newInput) {
     //. console.log("submit Sign Up now");
-    const { content } = this.state;
+    const { content, appUserName } = this.state;
     content.push(newInput);
     this.setState((state) => {
       return {
@@ -148,7 +157,10 @@ class ToDo extends Component {
         // 'Content-Type': 'application/x-www-form-urlencoded',
       },
       referrerPolicy: "no-referrer", // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
-      body: JSON.stringify({ text: content[content.length - 1] }),
+      body: JSON.stringify({
+        text: content[content.length - 1],
+        userIdentification: appUserName,
+      }),
       // body data type must match "Content-Type" header
     }).then((res) => {});
     this.getList();
@@ -166,7 +178,7 @@ class ToDo extends Component {
   }
 
   getList() {
-    var { taskholder } = this.state;
+    var { taskholder, appUserName } = this.state;
     fetch("http://localhost:5000/tasks", {
       method: "GET",
       mode: "cors",
@@ -188,6 +200,8 @@ class ToDo extends Component {
 
         console.log("GETLIST FUNCTION TRIGGERED");
       });
+
+    console.log(this.state.taskholder);
   }
 
   removeTask(e) {
@@ -221,7 +235,8 @@ class ToDo extends Component {
   }
 
   render() {
-    var { content, choice, taskholder, appUserName, appUserData } = this.state;
+    var { content, choice, taskholder, appUserName, appUserData, appListName } =
+      this.state;
 
     const inputBoxAndButton = (
       <div>
@@ -234,7 +249,7 @@ class ToDo extends Component {
           ></input>
           <input
             onClick={() => this.addTask(this.state.value)}
-            type="submit"
+            type="button"
             value="Submit"
           />
         </form>
@@ -247,13 +262,13 @@ class ToDo extends Component {
           <input
             placeholder="name your list and save"
             type="text"
-            value={this.state.valueName}
+            value={this.state.value}
             onChange={this.handleChange}
           ></input>
           <input
-            onClick={() => this.saveList(this.state.valueName)}
-            type="submit"
-            value="Save List"
+            onClick={() => this.saveList(this.state.value)}
+            type="button"
+            value="SaveList"
           />
         </form>
       </div>
@@ -275,19 +290,24 @@ class ToDo extends Component {
     const list = (
       <div>
         {Object.keys(taskholder).map((keyName, i) => {
-          return (
-            <div key={i}>
-              <button
-                onClick={(e) => this.removeTask(e)}
-                type="button"
-                id={taskholder[parseInt(keyName, 10)]._id}
-              >
-                X
-              </button>
-              &nbsp;&nbsp;{i + 1} &nbsp; &nbsp; &nbsp; &nbsp;{" "}
-              {taskholder[parseInt(keyName, 10)].text}
-            </div>
-          );
+          if (
+            taskholder[i].userIdentification === this.state.appUserName &&
+            taskholder[i].listname === this.state.appListName
+          ) {
+            return (
+              <div key={i}>
+                <button
+                  onClick={(e) => this.removeTask(e)}
+                  type="button"
+                  id={taskholder[parseInt(keyName, 10)]._id}
+                >
+                  X
+                </button>
+                &nbsp;&nbsp;{i + 1} &nbsp; &nbsp; &nbsp; &nbsp;{" "}
+                {taskholder[parseInt(keyName, 10)].text}
+              </div>
+            );
+          }
         })}
         {inputBoxAndButton}
       </div>
@@ -300,11 +320,13 @@ class ToDo extends Component {
           User Name is :{" "}
           <div>{appUserName ? appUserName : "this is empty"} </div>
         </h5>
-        <button>Create a new task list</button>
-        <button>Navigate to your saved lists</button> {saveListNameAndInput}
+        {saveListNameAndInput}
         <h1>To Do Task List!</h1>
         <div>
           <div> &nbsp; &nbsp; &nbsp;</div>
+          <div>
+            Name of List is : {appListName ? appListName : "empty name"}
+          </div>
           <div>{list}</div>
         </div>
       </div>

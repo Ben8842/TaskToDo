@@ -92,29 +92,26 @@ app.delete("/tasks/:id", (req, res) => {
 });
 
 // save name to list
-/*
+
 app.put("/tasks", (req, res) => {
-  console.log("we are saving task", req.params);
+  console.log("we are saving a list name", req.params);
   console.log("value is", req.body);
   const body = req.body;
+  const taskObject = new tasklist(body);
   // message.findOneAndDelete({ _id: req.params.id });
-  message.findById(req.params.id).then((messageItem) => {
-    if (!messageItem.negativeVote.includes(body.email)) {
-      message.findByIdAndUpdate(
-        req.params.id,
-        { $push: { negativeVote: body.email } },
-        function (error) {
-          if (error) {
-            console.log(error);
-          } else {
-            console.log("voting down is a success");
-          }
-        }
-      );
-    }
-  });
+  tasklist
+    .find({})
+    .where("userIdentification")
+    .equals(body.appUserName)
+    .updateMany({}, { $set: { listname: body.appListName } })
+    .exec((error, data) => {
+      console.log(body.appListName);
+      console.log("hello PUT" + data);
+
+      //res.json(data[0]._id);
+    });
+  //.sort("-createdAt");
 });
-*/
 
 //Delete a specific message using id
 
