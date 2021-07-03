@@ -139,7 +139,7 @@ class ToDo extends Component {
 
   addTask(newInput) {
     //. console.log("submit Sign Up now");
-    const { content, appUserName } = this.state;
+    const { content, appUserName, appListName } = this.state;
     content.push(newInput);
     this.setState((state) => {
       return {
@@ -159,6 +159,7 @@ class ToDo extends Component {
       referrerPolicy: "no-referrer", // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
       body: JSON.stringify({
         text: content[content.length - 1],
+        listname: appListName,
         userIdentification: appUserName,
       }),
       // body data type must match "Content-Type" header
