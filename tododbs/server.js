@@ -37,6 +37,7 @@ app.post("/userinfo", (req, res) => {
   userinfoObject.save();
 });
 
+//getting the userinfo
 app.get("/userinfo", (req, res) => {
   console.log("GETTING userinfo");
 
@@ -52,9 +53,52 @@ app.get("/userinfo", (req, res) => {
     .sort("-createdAt");
 });
 
+//pushing listname to listarray
+app.put("/userinfo", (req, res) => {
+  console.log("PUT ON USERINFO START", req.params);
+  console.log("value is", req.body);
+  const body = req.body;
+  const taskObject = new tasklist(body);
+  console.log("value is", body.saveName);
+  // message.findOneAndDelete({ _id: req.params.id });
+  tasklist
+    .find({})
+    .where("userIdentification")
+    .equals(body.appUserName)
+    .updateOne({}, { $push: { listnamearray: body.listnamearray } })
+    .exec((error, data) => {
+      console.log(body.saveName + "body,saveName" + body.listnamearray);
+      console.log("PUT ON USERINFO COMPLETE" + data);
+
+      //res.json(data[0]._id);
+    });
+  //.sort("-createdAt");
+});
+
+// save name to list
+app.put("/tasks", (req, res) => {
+  console.log("PUT ON TASKS BEGIN", req.params);
+  console.log("value is", req.body);
+  const body = req.body;
+  const taskObject = new tasklist(body);
+  // message.findOneAndDelete({ _id: req.params.id });
+  tasklist
+    .find({})
+    .where("userIdentification")
+    .equals(body.appUserName)
+    .updateMany({}, { $set: { listname: body.listname } })
+    .exec((error, data) => {
+      console.log(body.saveName);
+      console.log("PUT ON TASKS COMPLETE");
+
+      //res.json(data[0]._id);
+    });
+  //.sort("-createdAt");
+});
+
 //save a message to the message collection
 app.post("/tasks", (req, res) => {
-  console.log("posting super task");
+  console.log("posting super task" + req.body);
   const body = req.body;
   const taskObject = new tasklist(body);
   taskObject.save();
@@ -89,28 +133,6 @@ app.delete("/tasks/:id", (req, res) => {
   });
   // message.deleteOne({ _id: "ObjectId(" + req.params.id + ")" });
   res.send("delete message here");
-});
-
-// save name to list
-
-app.put("/tasks", (req, res) => {
-  console.log("we are saving a list name", req.params);
-  console.log("value is", req.body);
-  const body = req.body;
-  const taskObject = new tasklist(body);
-  // message.findOneAndDelete({ _id: req.params.id });
-  tasklist
-    .find({})
-    .where("userIdentification")
-    .equals(body.appUserName)
-    .updateMany({}, { $set: { listname: body.appListName } })
-    .exec((error, data) => {
-      console.log(body.appListName);
-      console.log("hello PUT" + data);
-
-      //res.json(data[0]._id);
-    });
-  //.sort("-createdAt");
 });
 
 //Delete a specific message using id

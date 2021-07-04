@@ -5,7 +5,7 @@ const userinfo = new schema(
     username: String,
     email: String,
     password: String,
-    listname: [String],
+    listnamearray: [String],
   },
   { timestamps: true }
 );
