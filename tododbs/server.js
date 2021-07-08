@@ -16,8 +16,11 @@ const corsOptions = {
 app.use(cors(corsOptions));
 
 const path = require("path");
-const tasklist = require("./models/tasklist");
+const todoitem = require("./models/todoitem");
 const userinfo = require("./models/userinfo");
+
+const db = require("./db/db.js");
+console.log(db);
 
 //const { getMaxListeners } = require("./models/user");
 
@@ -58,17 +61,18 @@ app.put("/userinfo", (req, res) => {
   console.log("PUT ON USERINFO START", req.params);
   console.log("value is", req.body);
   const body = req.body;
-  const taskObject = new tasklist(body);
-  console.log("value is", body.saveName);
+  const taskObject = new userinfo(body);
+  console.log(taskObject);
+  console.log("value is", body.listnamearray);
   // message.findOneAndDelete({ _id: req.params.id });
-  tasklist
+  userinfo
     .find({})
-    .where("userIdentification")
-    .equals(body.appUserName)
+    .where("_id")
+    .equals(body.userIdentification)
     .updateOne({}, { $push: { listnamearray: body.listnamearray } })
     .exec((error, data) => {
-      console.log(body.saveName + "body,saveName" + body.listnamearray);
-      console.log("PUT ON USERINFO COMPLETE" + data);
+      console.log("body.listnamearray", body.listnamearray);
+      console.log("PUT ON USERINFO COMPLETE", data);
 
       //res.json(data[0]._id);
     });
@@ -80,16 +84,18 @@ app.put("/tasks", (req, res) => {
   console.log("PUT ON TASKS BEGIN", req.params);
   console.log("value is", req.body);
   const body = req.body;
-  const taskObject = new tasklist(body);
+  const taskObject = new todoitem(body);
   // message.findOneAndDelete({ _id: req.params.id });
-  tasklist
+  todoitem
     .find({})
     .where("userIdentification")
-    .equals(body.appUserName)
+    .equals(body.userIdentification)
     .updateMany({}, { $set: { listname: body.listname } })
     .exec((error, data) => {
       console.log(body.saveName);
       console.log("PUT ON TASKS COMPLETE");
+      console.log("the userIdentification is : " + body.userIdentification);
+      console.log(body);
 
       //res.json(data[0]._id);
     });
@@ -100,7 +106,7 @@ app.put("/tasks", (req, res) => {
 app.post("/tasks", (req, res) => {
   console.log("posting super task" + req.body);
   const body = req.body;
-  const taskObject = new tasklist(body);
+  const taskObject = new todoitem(body);
   taskObject.save();
 });
 
@@ -108,7 +114,7 @@ app.post("/tasks", (req, res) => {
 app.get("/tasks", (req, res) => {
   console.log("GETTING MESSAGE");
 
-  tasklist
+  todoitem
     .find(
       {},
 
@@ -124,7 +130,7 @@ app.get("/tasks", (req, res) => {
 app.delete("/tasks/:id", (req, res) => {
   console.log("we are deleting", req.params);
   // message.findOneAndDelete({ _id: req.params.id });
-  tasklist.findByIdAndDelete(req.params.id, function (error) {
+  todoitem.findByIdAndDelete(req.params.id, function (error) {
     if (error) {
       console.log(error);
     } else {

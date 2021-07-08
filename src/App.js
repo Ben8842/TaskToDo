@@ -15,6 +15,9 @@ class ToDo extends Component {
       appUserName: "",
       appUserData: [],
       appListName: "",
+      listName: "",
+      taskName: "",
+      saveName: "",
     };
 
     this.handleChange = this.handleChange.bind(this);
@@ -84,59 +87,156 @@ class ToDo extends Component {
             JSON.stringify(this.state.appUserName)
           );
         });
+      console.log(this.state);
     }
 
     this.getList();
   }
 
   saveList(nameinput) {
-    this.setState({ appListName: nameinput });
     var { appUserName, appListName } = this.state;
+    console.log("PUT on tasks first.  here we go.  ");
+    this.setState({ appListName: nameinput });
+    console.log(appUserName);
 
-    fetch("http://localhost:5000/tasks", {
-      method: "PUT",
-      mode: "cors",
-      cache: "no-cache",
-      credentials: "same-origin",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      referrerPolicy: "no-referrer",
-      body: JSON.stringify({ appUserName, appListName }),
-      //   body: JSON.stringify({ showButtonIndex }),
-    }).then((res) => {
-      console.log(res);
-      this.getList();
-      //    console.log("something happening here" + res);
-    });
+    Promise.all([
+      fetch("http://localhost:5000/tasks", {
+        method: "PUT",
+        mode: "cors",
+        cache: "no-cache",
+        credentials: "same-origin",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        referrerPolicy: "no-referrer",
+        body: JSON.stringify({
+          userIdentification: appUserName,
+          listname: this.state.saveName,
+        }),
+        //   body: JSON.stringify({ showButtonIndex }),
+      }),
+      fetch("http://localhost:5000/userinfo", {
+        method: "PUT",
+        mode: "cors",
+        cache: "no-cache",
+        credentials: "same-origin",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        referrerPolicy: "no-referrer",
+        body: JSON.stringify({
+          userIdentification: appUserName,
+          listnamearray: this.state.saveName,
+        }),
+        //   body: JSON.stringify({ showButtonIndex }),
+      }).then((res) => {
+        console.log(res);
+        console.log("PUT on tasks complete (hopefully both this time");
 
-    console.log("hello name of list SAVING" + nameinput);
+        // this.getList();
+        //    console.log("something happening here" + res);
+      }),
+    ]);
+
+    console.log("hello name of list SAVING" + this.state.saveName);
     localStorage.setItem(
       "userLocalList",
       JSON.stringify(this.state.appListName)
     );
     //this.clickHandler();
+
+    console.log("pushing to list array: " + nameinput);
+    this.getList();
+    //this.clickHandler();
   }
+
+  /*
+  saveList(nameinput) {
+    var { appUserName, appListName } = this.state;
+    console.log("PUT on tasks first.  here we go.  ");
+    this.setState({ appListName: nameinput }, () => {
+      fetch("http://localhost:5000/tasks", {
+        method: "PUT",
+        mode: "cors",
+        cache: "no-cache",
+        credentials: "same-origin",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        referrerPolicy: "no-referrer",
+        body: JSON.stringify({
+          userIdentification: appUserName,
+          listname: this.state.saveName,
+        }),
+        //   body: JSON.stringify({ showButtonIndex }),
+      })
+        .then((res) => {
+          console.log(res);
+          console.log("PUT on tasks complete");
+          // this.getList();
+          //    console.log("something happening here" + res);
+        })
+        .then((res) => {
+          console.log("PUT on userinfo starting now");
+          fetch("http://localhost:5000/userinfo", {
+            method: "PUT",
+            mode: "cors",
+            cache: "no-cache",
+            credentials: "same-origin",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            referrerPolicy: "no-referrer",
+            body: JSON.stringify({
+              useridentification: appUserName,
+              listnamearray: this.state.saveName,
+            }),
+            //   body: JSON.stringify({ showButtonIndex }),
+          }).then((res) => {
+            console.log("PUT on userinfo complete");
+            console.log(res);
+            this.getList();
+            //    console.log("something happening here" + res);
+          });
+          //    console.log("something happening here" + res);
+        });
+
+      console.log("hello name of list SAVING" + this.state.saveName);
+      localStorage.setItem(
+        "userLocalList",
+        JSON.stringify(this.state.appListName)
+      );
+      //this.clickHandler();
+
+      console.log("pushing to list array: " + nameinput);
+    });
+    //this.clickHandler();
+  }
+  */
 
   shuffle(arry) {
     arry.sort(() => Math.random() - 0.5);
   }
 
   handleChange(event) {
+    const value = event.target.value;
     this.setState({
-      value: event.target.value,
-      valueName: event.target.valueName,
+      ...this.state,
+      [event.target.name]: value,
     });
+    console.log("save name is " + this.state.saveName);
+    console.log("task name is " + this.state.taskName);
   }
 
   handleSubmit(event) {
     event.preventDefault();
     this.setState({
-      value: "",
-      valueName: "",
+      listName: "",
+      saveName: "",
     });
   }
 
+  //content[content.length - 1]
   addTask(newInput) {
     //. console.log("submit Sign Up now");
     const { content, appUserName, appListName } = this.state;
@@ -146,6 +246,7 @@ class ToDo extends Component {
         content: content,
       };
     });
+    console.log(content);
     //  console.log(JSON.stringify({ email, password }));
     fetch("http://localhost:5000/tasks", {
       method: "POST",
@@ -158,7 +259,7 @@ class ToDo extends Component {
       },
       referrerPolicy: "no-referrer", // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
       body: JSON.stringify({
-        text: content[content.length - 1],
+        text: this.state.taskName,
         listname: appListName,
         userIdentification: appUserName,
       }),
@@ -245,14 +346,11 @@ class ToDo extends Component {
           <input
             placeholder="type a new task"
             type="text"
-            value={this.state.value}
+            name="taskName"
+            value={this.state.name}
             onChange={this.handleChange}
           ></input>
-          <input
-            onClick={() => this.addTask(this.state.value)}
-            type="button"
-            value="Submit"
-          />
+          <input onClick={() => this.addTask(this.state.value)} type="submit" />
         </form>
       </div>
     );
@@ -263,13 +361,13 @@ class ToDo extends Component {
           <input
             placeholder="name your list and save"
             type="text"
-            value={this.state.value}
+            name="saveName"
+            value={this.state.name}
             onChange={this.handleChange}
           ></input>
           <input
             onClick={() => this.saveList(this.state.value)}
-            type="button"
-            value="SaveList"
+            type="submit"
           />
         </form>
       </div>
@@ -325,9 +423,7 @@ class ToDo extends Component {
         <h1>To Do Task List!</h1>
         <div>
           <div> &nbsp; &nbsp; &nbsp;</div>
-          <div>
-            Name of List is : {appListName ? appListName : "empty name"}
-          </div>
+          <div>Name of List is : {this.state.saveName + appListName}</div>
           <div>{list}</div>
         </div>
       </div>
