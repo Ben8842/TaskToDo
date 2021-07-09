@@ -10,6 +10,7 @@ class ToDo extends Component {
       value: "",
       choice: "",
       taskholder: [],
+      listholder: [],
       valueName: "",
       saveListFlag: false,
       appUserName: "",
@@ -139,10 +140,7 @@ class ToDo extends Component {
     ]);
 
     console.log("hello name of list SAVING" + this.state.saveName);
-    localStorage.setItem(
-      "userLocalList",
-      JSON.stringify(this.state.appListName)
-    );
+    localStorage.setItem("userLocalList", JSON.stringify(this.state.saveName));
     //this.clickHandler();
 
     console.log("pushing to list array: " + nameinput);
@@ -229,11 +227,13 @@ class ToDo extends Component {
   }
 
   handleSubmit(event) {
-    event.preventDefault();
+    // event.preventDefault();
     this.setState({
-      listName: "",
+      taskName: "",
       saveName: "",
     });
+    //  this.getList();
+    console.log(this.state.taskName);
   }
 
   //content[content.length - 1]
@@ -300,10 +300,33 @@ class ToDo extends Component {
           taskholder: data,
         });
 
-        console.log("GETLIST FUNCTION TRIGGERED");
+        console.log("GETLIST FUNCTION TRIGGERED-tasks");
       });
+    /*
+     fetch("http://localhost:5000/userinfo", {
+       method: "GET",
+       mode: "cors",
+       cache: "no-cache",
+       credentials: "same-origin",
+       headers: {
+         "Content-Type": "application/json",
+       },
+       referrerPolicy: "no-referrer",
+     })
+       .then((res) => {
+         //    console.log(JSON.stringify(res) + ".thenres");
+         return res.json();
+       })
+       .then((data) => {
+         this.setState({
+           listholder: data,
+         });
 
+         console.log("GETLIST FUNCTION TRIGGERED-userlist");
+       });
+*/
     console.log(this.state.taskholder);
+    console.log(this.state.listholder);
   }
 
   removeTask(e) {
